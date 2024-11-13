@@ -186,7 +186,6 @@ export default function KeyProviderFormPage() {
             />
           </Tab>
           <Tab
-            className="pf-v5-u-p-md"
             title={<TabTitleText>License</TabTitleText>}
             {...licenseTab}
           >
