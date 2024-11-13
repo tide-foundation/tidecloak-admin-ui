@@ -3,7 +3,7 @@ import type { Path } from "react-router-dom";
 import { generateEncodedPath } from "../../utils/generateEncodedPath";
 import type { AppRouteObject } from "../../routes";
 
-export type IdentityProviderTab = "settings" | "mappers" | "permissions";
+export type IdentityProviderTab = "settings" | "mappers" | "permissions" | "licenses"; // TIDECLOAK IMPLEMENTATION
 
 export type IdentityProviderParams = {
   realm: string;

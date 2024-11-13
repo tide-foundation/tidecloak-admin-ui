@@ -36,7 +36,7 @@ export const GeneralSettings = ({
       />
 
       <TextControl name="displayName" label={t("displayName")} />
-      <ClientIdSecret create={create} />
+      <ClientIdSecret create={create} isTideIdp={id === "tide"} />
       <DisplayOrder />
     </>
   );

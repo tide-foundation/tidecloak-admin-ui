@@ -29,6 +29,7 @@ import {
   TextVariants,
   ToolbarItem,
 } from "@patternfly/react-core";
+import { IFormatterValueType } from "@patternfly/react-table";
 import { groupBy, sortBy } from "lodash-es";
 import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -40,7 +41,6 @@ import { ViewHeader } from "../components/view-header/ViewHeader";
 import { useRealm } from "../context/realm-context/RealmContext";
 import { useServerInfo } from "../context/server-info/ServerInfoProvider";
 import helpUrls from "../help-urls";
-import { toEditOrganization } from "../organizations/routes/EditOrganization";
 import { upperCaseFormatter } from "../util";
 import { ManageOrderDialog } from "./ManageOrderDialog";
 import { toIdentityProvider } from "./routes/IdentityProvider";
@@ -170,6 +170,7 @@ export default function IdentityProvidersSection() {
       </DropdownGroup>
     ));
 
+  const hasValue = (value: string) => value !== undefined && value !== null && value !== "" ? true : false;
   const [toggleDeleteDialog, DeleteConfirm] = useConfirmDialog({
     titleKey: "deleteProvider",
     messageKey: t("deleteConfirm", { provider: selectedProvider?.alias }),
@@ -177,6 +178,13 @@ export default function IdentityProvidersSection() {
     continueButtonVariant: ButtonVariant.danger,
     onConfirm: async () => {
       try {
+        /** TIDECLOAK IMPLEMENTATION START */
+        if (selectedProvider!.alias! === "tide") {
+          await adminClient.tideAdmin.deleteImage({ type: "LOGO" }); //TIDE
+          await adminClient.tideAdmin.deleteImage({ type: "BACKGROUND_IMAGE" }); // TIDE
+        }
+        /** TIDECLOAK IMPLEMENTATION END */
+
         await adminClient.identityProviders.del({
           alias: selectedProvider!.alias!,
         });

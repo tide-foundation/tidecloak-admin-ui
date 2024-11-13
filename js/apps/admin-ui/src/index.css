@@ -6,6 +6,14 @@ img.keycloak__pageheader_brand {
   max-width: 1024px;
   padding-bottom: var(--pf-v5-global--spacer--4xl);
 }
+.tidecloak__full__width__form {
+  max-width: 100%;
+  padding-bottom: var(--pf-v5-global--spacer--4xl);
+}
+.tidecloak__license__model_cards{
+  height: 500px;
+}
+
 
 input[type="checkbox"] {
   height: 20px;

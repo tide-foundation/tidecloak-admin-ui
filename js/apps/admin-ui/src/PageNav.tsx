@@ -119,6 +119,8 @@ export const PageNav = () => {
               <LeftNav title="groups" path="/groups" />
               <LeftNav title="sessions" path="/sessions" />
               <LeftNav title="events" path="/events" />
+              {/** TIDECLOAK IMPLEMENTATION */}
+              <LeftNav title="Change Requests" path="/change-requests" />
             </NavGroup>
           )}
 

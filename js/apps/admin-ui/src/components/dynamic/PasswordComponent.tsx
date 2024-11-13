@@ -10,11 +10,13 @@ export const PasswordComponent = ({
   defaultValue,
   required,
   isDisabled = false,
+  isHidden = false, // TIDECLOAK IMPLEMENTATION
 }: ComponentProps) => {
   const { t } = useTranslation();
 
   return (
     <PasswordControl
+      style={{ display: isHidden ? 'none' : undefined }} // TIDECLOAK IMPLEMENTATION
       name={convertToName(name!)}
       label={t(label!)}
       labelIcon={t(helpText!)}

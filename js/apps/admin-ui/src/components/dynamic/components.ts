@@ -21,6 +21,8 @@ export type ComponentProps = Omit<ConfigPropertyRepresentation, "type"> & {
   isDisabled?: boolean;
   isNew?: boolean;
   stringify?: boolean;
+  isHidden?: boolean; // TIDECLOAK IMPLEMENTATION
+
 };
 
 type ComponentType =

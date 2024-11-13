@@ -1,24 +1,20 @@
 import { Button, ButtonVariant, ToolbarItem } from "@patternfly/react-core";
 import type { SVGIconProps } from "@patternfly/react-icons/dist/js/createIcon";
 import {
-  ActionsColumn,
-  ExpandableRowContent,
   IAction,
   IActions,
   IActionsResolver,
   IFormatter,
   IRow,
-  IRowCell,
   ITransform,
-  Table,
-  TableProps,
   TableVariant,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
 } from "@patternfly/react-table";
+import {
+  Table,
+  TableBody,
+  TableHeader,
+  TableProps,
+} from "@patternfly/react-table/deprecated";
 import { cloneDeep, differenceBy, get } from "lodash-es";
 import {
   ComponentClass,
@@ -29,16 +25,15 @@ import {
   useMemo,
   useRef,
   useState,
-  type JSX,
 } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useStoredState } from "../../utils/useStoredState";
+import { useStoredState } from "@keycloak/keycloak-ui-shared";
 import { useFetch } from "../../utils/useFetch";
-import { ListEmptyState } from "./ListEmptyState";
+import { KeycloakSpinner } from "../keycloak-spinner/KeycloakSpinner";
+import { ListEmptyState } from "../list-empty-state/ListEmptyState";
 import { PaginatingTableToolbar } from "./PaginatingTableToolbar";
 import { SyncAltIcon } from "@patternfly/react-icons";
-import { KeycloakSpinner } from "../KeycloakSpinner";
 
 type TitleCell = { title: JSX.Element };
 type Cell<T> = keyof T | JSX.Element | TitleCell;
@@ -72,18 +67,6 @@ type DataTableProps<T> = {
   isRadio?: boolean;
 };
 
-type CellRendererProps = {
-  row: IRow;
-};
-
-const CellRenderer = ({ row }: CellRendererProps) => {
-  const isRow = (c: ReactNode | IRowCell): c is IRowCell =>
-    !!c && (c as IRowCell).title !== undefined;
-  return row.cells!.map((c, i) => (
-    <Td key={`cell-${i}`}>{(isRow(c) ? c.title : c) as ReactNode}</Td>
-  ));
-};
-
 function DataTable<T>({
   columns,
   rows,
@@ -98,128 +81,32 @@ function DataTable<T>({
   ...props
 }: DataTableProps<T>) {
   const { t } = useTranslation();
-
-  const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
-  const [expandedRows, setExpandedRows] = useState<boolean[]>([]);
-
-  const updateState = (rowIndex: number, isSelected: boolean) => {
-    const items = [
-      ...(rowIndex === -1 ? Array(rows.length).fill(isSelected) : selectedRows),
-    ];
-    items[rowIndex] = isSelected;
-    setSelectedRows(items);
-  };
-
-  useEffect(() => {
-    if (canSelectAll) {
-      const selectAllCheckbox = document.getElementsByName("check-all").item(0);
-      if (selectAllCheckbox) {
-        const checkbox = selectAllCheckbox as HTMLInputElement;
-        const selected = selectedRows.filter((r) => r === true);
-        checkbox.indeterminate =
-          selected.length < rows.length && selected.length > 0;
-      }
-    }
-  }, [selectedRows]);
-
   return (
     <Table
       {...props}
       variant={isNotCompact ? undefined : TableVariant.compact}
+      onSelect={
+        onSelect
+          ? (_, isSelected, rowIndex) => onSelect(isSelected, rowIndex)
+          : undefined
+      }
+      onCollapse={
+        onCollapse
+          ? (_, rowIndex, isOpen) => onCollapse(isOpen, rowIndex)
+          : undefined
+      }
+      selectVariant={"checkbox"}
+      canSelectAll={canSelectAll}
+      cells={columns.map((column) => {
+        return { ...column, title: t(column.displayKey || column.name) };
+      })}
+      rows={rows as IRow[]}
+      actions={actions}
+      actionResolver={actionResolver}
       aria-label={t(ariaLabelKey)}
     >
-      <Thead>
-        <Tr>
-          {onCollapse && <Th />}
-          {canSelectAll && (
-            <Th
-              select={
-                !isRadio
-                  ? {
-                      onSelect: (_, isSelected, rowIndex) => {
-                        onSelect!(isSelected, rowIndex);
-                        updateState(-1, isSelected);
-                      },
-                      isSelected:
-                        selectedRows.filter((r) => r === true).length ===
-                        rows.length,
-                    }
-                  : undefined
-              }
-            />
-          )}
-          {columns.map((column) => (
-            <Th
-              key={column.displayKey}
-              className={column.transforms?.[0]().className}
-            >
-              {t(column.displayKey || column.name)}
-            </Th>
-          ))}
-        </Tr>
-      </Thead>
-      {!onCollapse ? (
-        <Tbody>
-          {(rows as IRow[]).map((row, index) => (
-            <Tr key={index} isExpanded={expandedRows[index]}>
-              {onSelect && (
-                <Td
-                  select={{
-                    rowIndex: index,
-                    onSelect: (_, isSelected, rowIndex) => {
-                      onSelect!(isSelected, rowIndex);
-                      updateState(rowIndex, isSelected);
-                    },
-                    isSelected: selectedRows[index],
-                    variant: isRadio ? "radio" : "checkbox",
-                  }}
-                />
-              )}
-              <CellRenderer row={row} />
-              {(actions || actionResolver) && (
-                <Td isActionCell>
-                  <ActionsColumn
-                    items={actions || actionResolver?.(row, {})!}
-                    extraData={{ rowIndex: index }}
-                  />
-                </Td>
-              )}
-            </Tr>
-          ))}
-        </Tbody>
-      ) : (
-        (rows as IRow[]).map((row, index) => (
-          <Tbody key={index}>
-            {index % 2 === 0 ? (
-              <Tr>
-                <Td
-                  expand={{
-                    isExpanded: !!expandedRows[index],
-                    rowIndex: index,
-                    expandId: `${index}`,
-                    onToggle: (_, rowIndex, isOpen) => {
-                      onCollapse(isOpen, rowIndex);
-                      const expand = [...expandedRows];
-                      expand[index] = isOpen;
-                      setExpandedRows(expand);
-                    },
-                  }}
-                />
-                <CellRenderer row={row} />
-              </Tr>
-            ) : (
-              <Tr isExpanded={!!expandedRows[index - 1]}>
-                <Td />
-                <Td colSpan={columns.length}>
-                  <ExpandableRowContent>
-                    <CellRenderer row={row} />
-                  </ExpandableRowContent>
-                </Td>
-              </Tr>
-            )}
-          </Tbody>
-        ))
-      )}
+      <TableHeader />
+      <TableBody />
     </Table>
   );
 }
@@ -342,10 +229,6 @@ export function KeycloakDataTable<T>({
 
   const renderCell = (columns: (Field<T> | DetailField<T>)[], value: T) => {
     return columns.map((col) => {
-      if ("cellFormatters" in col) {
-        const v = get(value, col.name);
-        return col.cellFormatters?.reduce((s, f) => f(s), v);
-      }
       if (col.cellRenderer) {
         const Component = col.cellRenderer;
         //@ts-ignore
@@ -366,7 +249,11 @@ export function KeycloakDataTable<T>({
             data: value,
             disableSelection: disabledRow,
             disableActions: disabledRow,
-            selected: !!selected.find((v) => get(v, "id") === get(value, "id")),
+            selected: !!selected.find((v) => {
+              const recordId = get(value, "id") ?? get(value, "draftRecordId");
+              const selectedId = get(v, "id") ?? get(v, "draftRecordId");
+              return recordId === selectedId;
+            }),
             isOpen: isDetailColumnsEnabled(value) ? false : undefined,
             cells: renderCell(columns, value),
           },
@@ -418,6 +305,22 @@ export function KeycloakDataTable<T>({
             .slice(first, first + max + 1),
     [search, first, max],
   );
+
+  useEffect(() => {
+    if (canSelectAll) {
+      const checkboxes = document
+        .getElementsByClassName("pf-v5-c-table__check")
+        .item(0);
+      if (checkboxes) {
+        const checkAllCheckbox = checkboxes.children!.item(
+          0,
+        )! as HTMLInputElement;
+        checkAllCheckbox.indeterminate =
+          selected.length > 0 &&
+          selected.length < (filteredData || rows)!.length;
+      }
+    }
+  }, [selected]);
 
   useFetch(
     async () => {
@@ -476,38 +379,59 @@ export function KeycloakDataTable<T>({
       return action;
     });
 
-  const _onSelect = (isSelected: boolean, rowIndex: number) => {
-    const data = filteredData || rows;
-    if (rowIndex === -1) {
-      setRows(
-        data!.map((row) => {
-          (row as Row<T>).selected = isSelected;
-          return row;
-        }),
-      );
-    } else {
-      (data![rowIndex] as Row<T>).selected = isSelected;
-
-      setRows([...rows!]);
-    }
-
-    // Keeps selected items when paginating
-    const difference = differenceBy(
-      selected,
-      data!.map((row) => row.data),
-      "id",
-    );
-
-    // Selected rows are any rows previously selected from a different page, plus current page selections
-    const selectedRows = [
-      ...difference,
-      ...data!.filter((row) => (row as Row<T>).selected).map((row) => row.data),
-    ];
-
-    setSelected(selectedRows);
-    onSelect!(selectedRows);
-  };
-
+    const _onSelect = (isSelected: boolean, rowIndex: number) => {
+      const data = filteredData || rows;
+      if (isRadio) {
+        // When isRadio is true, only handle single row selection
+          // // Deselect all rows first
+          data!.forEach((row) => {
+            (row as Row<T>).selected = false;
+          });
+    
+          // Select the specific row
+          (data![rowIndex] as Row<T>).selected = isSelected;
+    
+          // Update rows state with only one row selected
+          setRows([...rows!]);
+    
+          // Update selected state with the single selected row's data
+          const selectedRowData = isSelected ? [(data![rowIndex] as Row<T>).data] : [];
+          setSelected(selectedRowData);
+          onSelect!(selectedRowData);
+        
+      } else {
+        if (rowIndex === -1) {
+          // Handle Select All
+          setRows(
+            data!.map((row) => {
+              (row as Row<T>).selected = isSelected;
+              return row;
+            }),
+          );
+        } else {
+          // Handle individual row selection
+          (data![rowIndex] as Row<T>).selected = isSelected;
+          setRows([...rows!]);
+        }
+    
+        // Keeps selected items when paginating
+        const difference = differenceBy(
+          selected,
+          data!.map((row) => row.data),
+          "id",
+        );
+    
+        // Selected rows are any rows previously selected from a different page, plus current page selections
+        const selectedRows = [
+          ...difference,
+          ...data!.filter((row) => (row as Row<T>).selected).map((row) => row.data),
+        ];
+    
+        setSelected(selectedRows);
+        onSelect!(selectedRows);
+      }
+    };
+    
   const onCollapse = (isOpen: boolean, rowIndex: number) => {
     (data![rowIndex] as Row<T>).isOpen = isOpen;
     setRows([...data!]);

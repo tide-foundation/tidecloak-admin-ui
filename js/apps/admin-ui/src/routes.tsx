@@ -19,6 +19,8 @@ import realmRoutes from "./realm/routes";
 import sessionRoutes from "./sessions/routes";
 import userFederationRoutes from "./user-federation/routes";
 import userRoutes from "./user/routes";
+import changeRequestsRoutes from "./tide-change-requests/routes"; // TIDE IMPLEMENTATION
+import tideKeyRoute from "./realm-settings/keys/routes"; // TIDE IMPLEMENTATION
 
 export type AppRouteObjectHandle = {
   access: AccessType | AccessType[];
@@ -54,6 +56,8 @@ export const routes: AppRouteObject[] = [
   ...groupsRoutes,
   ...dashboardRoutes,
   ...pageRoutes,
+  ...changeRequestsRoutes, // TIDE IMPLEMENTATION
+  ...tideKeyRoute, // TIDE IMPLEMENTATION
   NotFoundRoute,
 ];
 

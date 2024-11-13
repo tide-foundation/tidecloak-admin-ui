@@ -6,6 +6,7 @@ import { useAdminClient } from "../admin-client";
 import { useAlerts } from "@keycloak/keycloak-ui-shared";
 import { FormAccess } from "../components/form/FormAccess";
 import { useRealm } from "../context/realm-context/RealmContext";
+import { resignSettings } from "../identity-providers/utils/SignSettingsUtil";
 
 type RealmSettingsLoginTabProps = {
   realm: RealmRepresentation;
@@ -39,10 +40,32 @@ export const RealmSettingsLoginTab = ({
           ? switches.reduce((realm, s) => Object.assign(realm, s), realm)
           : Object.assign(realm, switches),
       );
+
+      if (name === "registrationAllowed"){
+        const tideIdp = await adminClient.identityProviders.findOne({ alias: "tide" });
+        if (tideIdp) {
+          var sigs = await resignSettings(adminClient, realmName, tideIdp, realm) // TIDECLOAK IMPLEMENTATION
+
+          tideIdp!.config!["loginURLSig"] = sigs[1]
+          tideIdp!.config!["linkTideURLSig"] = sigs[2]
+
+          // Vendor Settings signaure
+          tideIdp!.config!["settingsSig"] = sigs[sigs.length - 2]
+          // Vendor Rotating Public
+          tideIdp!.config!["gVRKSig"] = sigs[sigs.length - 1]
+
+          await adminClient.identityProviders.update(
+            { alias: "tide" },
+            {
+              ...tideIdp!,
+            },
+          )
+        }
+      }
       addAlert(t("enableSwitchSuccess", { switch: t(name) }));
       refresh();
     } catch (error) {
-      addError("enableSwitchError", error);
+      addError(t("enableSwitchError"), error);
     }
   };
 
