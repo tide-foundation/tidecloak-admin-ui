@@ -28,10 +28,10 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useStoredState } from "@keycloak/keycloak-ui-shared";
+import { useStoredState } from "../../utils/useStoredState";
 import { useFetch } from "../../utils/useFetch";
-import { KeycloakSpinner } from "../keycloak-spinner/KeycloakSpinner";
-import { ListEmptyState } from "../list-empty-state/ListEmptyState";
+import { KeycloakSpinner } from "../KeycloakSpinner";
+import { ListEmptyState } from "./ListEmptyState";
 import { PaginatingTableToolbar } from "./PaginatingTableToolbar";
 import { SyncAltIcon } from "@patternfly/react-icons";
 

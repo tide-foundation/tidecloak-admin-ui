@@ -31,8 +31,7 @@ import NetworkClient from "../../../tide-modules/modules/TideJS/Clients/NetworkC
 import BaseSignRequest from "../../../tide-modules/modules/TideJS/Models/BaseSignRequest.js";
 import dVVKSigningFlow from "../../../tide-modules/modules/TideJS/Flow/SigningFlows/dVVKSigningFlow.js";
 import HashToPoint from "../../../tide-modules/modules/Cryptide/Hashing/H2P.js";
-import { useAlerts } from "../alert/Alerts.js";
-import { useFetch } from "../../utils/useFetch.js";
+import { useAlerts, useFetch } from "@keycloak/keycloak-ui-shared";
 import { TideLicenseHistory } from "./TideLicenseHistory";
 import NodeClient from "../../../tide-modules/modules/TideJS/Clients/NodeClient.js";
 import { KeyProviderParams } from "../../realm-settings/routes/KeyProvider.js";

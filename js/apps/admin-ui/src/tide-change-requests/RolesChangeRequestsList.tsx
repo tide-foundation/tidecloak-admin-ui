@@ -10,7 +10,7 @@ import {
   Button,
   ToolbarItem
 } from "@patternfly/react-core";
-import { KeycloakDataTable } from "../components/table-toolbar/KeycloakDataTable";
+import { KeycloakDataTable } from "@keycloak/keycloak-ui-shared";
 import RequestChangesUserRecord from "@keycloak/keycloak-admin-client/lib/defs/RequestChangesUserRecord"
 import CompositeRoleChangeRequest from "@keycloak/keycloak-admin-client/lib/defs/CompositeRoleChangeRequest"
 import RoleChangeRequest from "@keycloak/keycloak-admin-client/lib/defs/RoleChangeRequest"

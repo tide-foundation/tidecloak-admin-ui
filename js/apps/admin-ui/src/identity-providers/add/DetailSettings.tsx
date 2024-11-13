@@ -6,6 +6,9 @@ import {
   ScrollForm,
   useAlerts,
   useFetch,
+  KeycloakSpinner,
+  HelpItem,
+  ListEmptyState 
 } from "@keycloak/keycloak-ui-shared";
 import {
   AlertVariant,
@@ -41,10 +44,7 @@ import { useConfirmDialog } from "../../components/confirm-dialog/ConfirmDialog"
 import { DynamicComponents } from "../../components/dynamic/DynamicComponents";
 import { FixedButtonsGroup } from "../../components/form/FixedButtonGroup";
 import { FormAccess } from "../../components/form/FormAccess";
-import { KeycloakSpinner } from "../../components/keycloak-spinner/KeycloakSpinner";
-import { ListEmptyState } from "../../components/list-empty-state/ListEmptyState";
 import { PermissionsTab } from "../../components/permission-tab/PermissionTab";
-import { TideLicensingTab } from "../../components/tide-licensing-tab/TideLicensingTab";
 import {
   RoutableTabs,
   useRoutableTab,
@@ -73,20 +73,8 @@ import { OIDCGeneralSettings } from "./OIDCGeneralSettings";
 import { ReqAuthnConstraints } from "./ReqAuthnConstraintsSettings";
 import { SamlGeneralSettings } from "./SamlGeneralSettings";
 import { useAdminClient } from "../../admin-client";
-import { HelpItem } from "@keycloak/keycloak-ui-shared";
 import { FileUpload } from "../../components/json-file-upload/patternfly/FileUpload";
-import { GenSessKey, GetPublic } from "../../../tide-modules/modules/Cryptide/Math";
-import { Bytes2Hex, Hex2Bytes, StringToUint8Array } from "../../../tide-modules/modules/Cryptide/Serialization";
-import { Point } from "../../../tide-modules/modules/Cryptide/index";
-import NetworkClient from "../../../tide-modules/modules/TideJS/Clients/NetworkClient";
-import BaseSignRequest from "../../../tide-modules/modules/TideJS/Models/BaseSignRequest";
-import dVVKSigningFlow from "../../../tide-modules/modules/TideJS/Flow/SigningFlows/dVVKSigningFlow";
-import VendorSettings from "../../../tide-modules/modules/TideJS/Models/VendorSettings";
-import NodeClient from "../../../tide-modules/modules/TideJS/Clients/NodeClient";
-import { StringComponent } from "../../components/dynamic/StringComponent";
 import { toKeyProvider } from "../../realm-settings/routes/KeyProvider";
-import HashToPoint from "../../../tide-modules/modules/Cryptide/Hashing/H2P";
-import KeycloakAdminClient from "libs/keycloak-admin-client/lib";
 import { createTideComponent, findTideComponent, resignSettings } from "../utils/SignSettingsUtil";
 
 type HeaderProps = {
@@ -591,6 +579,7 @@ export default function DetailSettings() {
 
   const isOIDC = provider.providerId!.includes("oidc");
   const isSAML = provider.providerId!.includes("saml");
+  const isSocial = !isOIDC && !isSAML;
 
   const loader = async () => {
     const [loaderMappers, loaderMapperTypes] = await Promise.all([

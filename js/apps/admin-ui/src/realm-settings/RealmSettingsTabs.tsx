@@ -26,9 +26,8 @@ import {
   useRoutableTab,
 } from "../components/routable-tabs/RoutableTabs";
 import { ViewHeader } from "../components/view-header/ViewHeader";
-import { useRealms } from "../context/RealmsContext";
-import { useAccess } from "../context/access/Access";
 import { useRealm } from "../context/realm-context/RealmContext";
+import { useAccess } from "../context/access/Access";
 import { toDashboard } from "../dashboard/routes/Dashboard";
 import type { Environment } from "../environment";
 import helpUrls from "../help-urls";
@@ -78,7 +77,7 @@ const RealmSettingsHeader = ({
   const { adminClient } = useAdminClient();
   const { environment } = useEnvironment<Environment>();
   const { t } = useTranslation();
-  const { refresh: refreshRealms } = useRealms();
+  const { refresh: refreshRealms } = useRealm();
   const { addAlert, addError } = useAlerts();
   const navigate = useNavigate();
   const [partialImportOpen, setPartialImportOpen] = useState(false);
@@ -179,7 +178,7 @@ export const RealmSettingsTabs = () => {
   const { t } = useTranslation();
   const { addAlert, addError } = useAlerts();
   const { realm: realmName, realmRepresentation: realm, refresh } = useRealm();
-  const { refresh: refreshRealms } = useRealms();
+  const { refresh: refreshRealms } = useRealm();
   const combinedLocales = useLocale();
   const navigate = useNavigate();
   const isFeatureEnabled = useIsFeatureEnabled();

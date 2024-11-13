@@ -32,7 +32,6 @@ import { FormattedLink } from "../components/external-link/FormattedLink";
 import { FixedButtonsGroup } from "../components/form/FixedButtonGroup";
 import { FormAccess } from "../components/form/FormAccess";
 import { KeyValueInput } from "../components/key-value-form/KeyValueInput";
-import { KeycloakSpinner } from "../components/keycloak-spinner/KeycloakSpinner";
 import { useRealm } from "../context/realm-context/RealmContext";
 import {
   addTrailingSlash,

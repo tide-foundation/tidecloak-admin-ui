@@ -1,5 +1,6 @@
 import type IdentityProviderRepresentation from "@keycloak/keycloak-admin-client/lib/defs/identityProviderRepresentation";
 import type { IdentityProvidersQuery } from "@keycloak/keycloak-admin-client/lib/resources/identityProviders";
+import { toEditOrganization } from "../organizations/routes/EditOrganization";
 import {
   Action,
   IconMapper,

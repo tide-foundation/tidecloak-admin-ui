@@ -13,7 +13,7 @@ import {
   Button,
   ToolbarItem,
 } from "@patternfly/react-core";
-import { KeycloakDataTable } from "../components/table-toolbar/KeycloakDataTable";
+import { KeycloakDataTable } from "@keycloak/keycloak-ui-shared";
 import RoleChangeRequest from "@keycloak/keycloak-admin-client/lib/defs/RoleChangeRequest"
 import RequestChangesUserRecord from "@keycloak/keycloak-admin-client/lib/defs/RequestChangesUserRecord"
 import { ViewHeader } from "../components/view-header/ViewHeader";
